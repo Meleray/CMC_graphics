@@ -19,7 +19,14 @@ struct Image
 {
   explicit Image(const std::string &a_path);
   Image(int a_width, int a_height, int a_channels);
-
+  Image() {
+    width = -1;
+    height = -1;
+    channels = 3;
+    size = 0;
+    data = nullptr;
+    self_allocated = false;
+  }
   int Save(const std::string &a_path);
 
   int Width()    const { return width; }
@@ -29,7 +36,7 @@ struct Image
   Pixel* Data()        { return  data; }
 
   Pixel GetPixel(int x, int y) { return data[width * y + x];}
-  void  PutPixel(int x, int y, const Pixel &pix) { data[width* y + x] = pix; }
+  void  PutPixel(int x, int y, const Pixel &pix) { data[width * y + x] = pix; }
 
   ~Image();
 

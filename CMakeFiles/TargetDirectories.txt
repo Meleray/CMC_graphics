@@ -1,0 +1,3 @@
+/home/mk/Documents/CMC/SEM_6/Graphics/msu_cmc_cg_2021/CMakeFiles/rebuild_cache.dir
+/home/mk/Documents/CMC/SEM_6/Graphics/msu_cmc_cg_2021/CMakeFiles/edit_cache.dir
+/home/mk/Documents/CMC/SEM_6/Graphics/msu_cmc_cg_2021/CMakeFiles/main.dir

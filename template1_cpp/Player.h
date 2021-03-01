@@ -2,6 +2,9 @@
 #define MAIN_PLAYER_H
 
 #include "Image.h"
+#include <vector>
+#include <string>
+#include <iostream>
 
 struct Point
 {
@@ -17,10 +20,34 @@ enum class MovementDir
   RIGHT
 };
 
+const int LAB_Y = 5;
+const int LAB_X = 7;
+const int LEVEL_Y = 14;
+const int LEVEL_X = 17;
+const int WINDOW_WIDTH = 1024, WINDOW_HEIGHT = 1024;
+
+struct Labirynth
+{
+
+  Labirynth() {}
+  Labirynth(const std::string &a_path, Image *screen, Image *background);
+  void draw_level(int x, int y);
+  std::pair<int, int> get_tile_coords(int x, int y);
+  Image *background;
+  Image *screen;
+private:
+  std::vector<std::string> lab;
+  std::vector<std::string> level;
+};
+
 struct Player
 {
-  explicit Player(Point pos = {.x = 10, .y = 10}) :
-                 coords(pos), old_coords(coords) {};
+  Player(Labirynth *lb, Point pos = {.x = 10, .y = 10})
+  {
+      coords = pos;
+      old_coords = pos;
+      lab = lb;
+  }
 
   bool Moved() const;
   void ProcessInput(MovementDir dir);
@@ -30,8 +57,10 @@ private:
   Point coords {.x = 10, .y = 10};
   Point old_coords {.x = 10, .y = 10};
   Pixel color {.r = 255, .g = 255, .b = 0, .a = 255};
-  int move_speed = 4;
-
+  int move_speed = 2;
+  int x_global = 0, y_global = 0;
+  int x_level, y_level;
+  Labirynth *lab;
 };
 
 #endif //MAIN_PLAYER_H

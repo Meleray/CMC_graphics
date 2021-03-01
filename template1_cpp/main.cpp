@@ -5,8 +5,6 @@
 #define GLFW_DLL
 #include <GLFW/glfw3.h>
 
-constexpr GLsizei WINDOW_WIDTH = 1024, WINDOW_HEIGHT = 1024;
-
 struct InputState
 {
   bool keys[1024]{}; //массив состояний кнопок - нажата/не нажата
@@ -19,6 +17,7 @@ struct InputState
 
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
+
 
 
 void OnKeyboardPressed(GLFWwindow* window, int key, int scancode, int action, int mode)
@@ -147,12 +146,12 @@ int main(int argc, char** argv)
 	while (gl_error != GL_NO_ERROR)
 		gl_error = glGetError();
 
-	Point starting_pos{.x = WINDOW_WIDTH / 2, .y = WINDOW_HEIGHT / 2};
-	Player player{starting_pos};
+	Point starting_pos{.x = WINDOW_WIDTH / 2, .y = WINDOW_HEIGHT / 2 + (LEVEL_Y - 3) / 2 * tileSize};
 
-	Image img("../resources/tex.png");
-	Image screenBuffer(WINDOW_WIDTH, WINDOW_HEIGHT, 4);
-
+	static Image screenBuffer(WINDOW_WIDTH, WINDOW_HEIGHT, 4);
+  static Image background(WINDOW_WIDTH, WINDOW_HEIGHT, 4);
+  Labirynth lab("./template1_cpp/data/Labirynth.txt", &screenBuffer, &background);
+  Player player(&lab, starting_pos);
   glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);  GL_CHECK_ERRORS;
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f); GL_CHECK_ERRORS;
 
