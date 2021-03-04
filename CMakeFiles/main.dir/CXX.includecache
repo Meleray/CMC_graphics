@@ -10,6 +10,16 @@
 string
 -
 
+/home/mk/Documents/CMC/SEM_6/Graphics/msu_cmc_cg_2021/template1_cpp/Player.cpp
+Player.h
+/home/mk/Documents/CMC/SEM_6/Graphics/msu_cmc_cg_2021/template1_cpp/Player.h
+iostream
+-
+fstream
+-
+cmath
+-
+
 /home/mk/Documents/CMC/SEM_6/Graphics/msu_cmc_cg_2021/template1_cpp/Player.h
 Image.h
 /home/mk/Documents/CMC/SEM_6/Graphics/msu_cmc_cg_2021/template1_cpp/Image.h

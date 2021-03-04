@@ -31,11 +31,10 @@ struct Labirynth
 
   Labirynth() {}
   Labirynth(const std::string &a_path, Image *screen, Image *background);
-  void draw_level(int x, int y);
+  int draw_level(int x, int y);
   std::pair<int, int> get_tile_coords(int x, int y);
   Image *background;
   Image *screen;
-private:
   std::vector<std::string> lab;
   std::vector<std::string> level;
 };
@@ -50,14 +49,14 @@ struct Player
   }
 
   bool Moved() const;
-  void ProcessInput(MovementDir dir);
+  int ProcessInput(MovementDir dir);
   void Draw(Image &screen);
 
 private:
   Point coords {.x = 10, .y = 10};
   Point old_coords {.x = 10, .y = 10};
   Pixel color {.r = 255, .g = 255, .b = 0, .a = 255};
-  int move_speed = 2;
+  int move_speed = 1;
   int x_global = 0, y_global = 0;
   int x_level, y_level;
   Labirynth *lab;

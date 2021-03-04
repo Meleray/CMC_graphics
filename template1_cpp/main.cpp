@@ -42,16 +42,16 @@ void OnKeyboardPressed(GLFWwindow* window, int key, int scancode, int action, in
 	}
 }
 
-void processPlayerMovement(Player &player)
+int processPlayerMovement(Player &player)
 {
   if (Input.keys[GLFW_KEY_W])
-    player.ProcessInput(MovementDir::UP);
+    return player.ProcessInput(MovementDir::UP);
   else if (Input.keys[GLFW_KEY_S])
-    player.ProcessInput(MovementDir::DOWN);
+    return player.ProcessInput(MovementDir::DOWN);
   if (Input.keys[GLFW_KEY_A])
-    player.ProcessInput(MovementDir::LEFT);
+    return player.ProcessInput(MovementDir::LEFT);
   else if (Input.keys[GLFW_KEY_D])
-    player.ProcessInput(MovementDir::RIGHT);
+    return player.ProcessInput(MovementDir::RIGHT);
 }
 
 void OnMouseButtonClicked(GLFWwindow* window, int button, int action, int mods)
@@ -107,7 +107,7 @@ int initGL()
 
   std::cout << "Controls: "<< std::endl;
   std::cout << "press right mouse button to capture/release mouse cursor  "<< std::endl;
-  std::cout << "W, A, S, D - movement  "<< std::endl;
+  std::cout << "W, A, S, D - movement"<< std::endl;
   std::cout << "press ESC to exit" << std::endl;
 
 	return 0;
@@ -146,7 +146,7 @@ int main(int argc, char** argv)
 	while (gl_error != GL_NO_ERROR)
 		gl_error = glGetError();
 
-	Point starting_pos{.x = WINDOW_WIDTH / 2, .y = WINDOW_HEIGHT / 2 + (LEVEL_Y - 3) / 2 * tileSize};
+	Point starting_pos{.x = WINDOW_WIDTH / 2, .y = WINDOW_HEIGHT / 2 + (LEVEL_Y / 2 - 3) * tileSize};
 
 	static Image screenBuffer(WINDOW_WIDTH, WINDOW_HEIGHT, 4);
   static Image background(WINDOW_WIDTH, WINDOW_HEIGHT, 4);
@@ -163,9 +163,13 @@ int main(int argc, char** argv)
 		lastFrame = currentFrame;
     glfwPollEvents();
 
-    processPlayerMovement(player);
-    player.Draw(screenBuffer);
+    int end = processPlayerMovement(player);
+    if (end == -1) {
+      glfwSetWindowShouldClose(window, GL_TRUE);
+      continue;
+    }
 
+    player.Draw(screenBuffer);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); GL_CHECK_ERRORS;
     glDrawPixels (WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, screenBuffer.Data()); GL_CHECK_ERRORS;
 
