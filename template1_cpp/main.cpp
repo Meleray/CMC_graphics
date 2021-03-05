@@ -1,6 +1,9 @@
 #include "common.h"
 #include "Image.h"
 #include "Player.h"
+#include <unistd.h>
+
+const unsigned int MS = 1000000;
 
 #define GLFW_DLL
 #include <GLFW/glfw3.h>
@@ -17,7 +20,6 @@ struct InputState
 
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
-
 
 
 void OnKeyboardPressed(GLFWwindow* window, int key, int scancode, int action, int mode)
@@ -165,6 +167,11 @@ int main(int argc, char** argv)
 
     int end = processPlayerMovement(player);
     if (end == -1) {
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); GL_CHECK_ERRORS;
+      glDrawPixels (WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, screenBuffer.Data()); GL_CHECK_ERRORS;
+
+	  	glfwSwapBuffers(window);
+      usleep(5 * MS);
       glfwSetWindowShouldClose(window, GL_TRUE);
       continue;
     }

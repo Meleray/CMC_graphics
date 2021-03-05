@@ -35,8 +35,10 @@ struct Labirynth
   std::pair<int, int> get_tile_coords(int x, int y);
   Image *background;
   Image *screen;
+  int x_offs = 0;
   std::vector<std::string> lab;
   std::vector<std::string> level;
+  std::vector<std::vector<bool>> used;
 };
 
 struct Player
@@ -56,9 +58,9 @@ private:
   Point coords {.x = 10, .y = 10};
   Point old_coords {.x = 10, .y = 10};
   Pixel color {.r = 255, .g = 255, .b = 0, .a = 255};
-  int move_speed = 1;
+  int move_speed = 2;
   int x_global = 0, y_global = 0;
-  int x_level, y_level;
+  int counter = 0;
   Labirynth *lab;
 };
 

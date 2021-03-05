@@ -20,6 +20,14 @@ std::pair<int, int> get_tile_coords(int x, int y) {
         (y - WINDOW_HEIGHT / 2 + tileSize * LEVEL_Y / 2) / tileSize};
 }
 
+void draw_img(Image &img, int x, int y, Image *screen) {
+  for (int i = y; i < y + img.Height(); ++i) {
+    for (int j = x; j < x + img.Width(); ++j) {
+      screen->PutPixel(j, i, img.GetPixel(j - x, img.Height() - (i - y) - 1));
+    }
+  }
+}
+
 bool Player::Moved() const
 {
   if(coords.x == old_coords.x && coords.y == old_coords.y)
@@ -53,17 +61,20 @@ int Player::ProcessInput(MovementDir dir)
     default:
       break;
   }
-  std::pair<int, int> tile_coords = get_tile_coords(coords.x + tileSize / 2, coords.y + tileSize / 2);
+  std::pair<int, int> tile_coords = get_tile_coords(coords.x + tileSize / 2, coords.y);
   char c = lab->level[tile_coords.second][tile_coords.first];
+  if (c == ' ') {
+    Image gameover = Image("./template1_cpp/img/Gameover.png");
+    draw_img(gameover, WINDOW_WIDTH / 2 - LEVEL_X * tileSize / 2, WINDOW_HEIGHT - 20 * tileSize, this->lab->screen);
+    return -1;
+  }
+  tile_coords = get_tile_coords(coords.x + tileSize / 2, coords.y + tileSize / 2);
+  c = lab->level[tile_coords.second][tile_coords.first];
   if (c == '#') {
     coords.x = old_coords.x;
     coords.y = old_coords.y;
     old_coords.x = x;
     old_coords.y = y;
-  }
-  if (c == ' ') {
-    std::cout << "Why would you ever want to jump into the abyss? :/" << std::endl;
-    return -1;
   }
   if (c == '@') {
     int dx = sgn(coords.x - WINDOW_WIDTH / 2);
@@ -75,6 +86,17 @@ int Player::ProcessInput(MovementDir dir)
       coords.x = WINDOW_WIDTH / 2 - dx * (LEVEL_X / 2 - 3) * tileSize;
       coords.y = WINDOW_HEIGHT / 2 + dy * (LEVEL_Y / 2 - 3) * tileSize;
     }
+  }
+  if (c == 'G' && !this->lab->used[y_global][x_global]) {
+    Image gold = Image("./template1_cpp/img/chest_full_open_anim_f0.png");
+    draw_img(gold, this->lab->x_offs + this->counter * (tileSize + 3), WINDOW_HEIGHT / 2 - (LEVEL_Y / 2 + 2) * tileSize, this->lab->screen);
+    this->counter += 1;
+    this->lab->used[y_global][x_global] = true;
+  }
+  if (c == 'Q') {
+    Image gameover = Image("./template1_cpp/img/win.png");
+    draw_img(gameover, WINDOW_WIDTH / 2 - LEVEL_X * tileSize / 2, WINDOW_HEIGHT - 20 * tileSize, this->lab->screen);
+    return -1;
   }
   return 0;
 }
@@ -111,9 +133,15 @@ Labirynth::Labirynth(const std::string &a_path, Image *screen, Image *background
   std::ifstream f;
   f.open(a_path);
   this->lab.resize(LAB_Y);
+  this->used.resize(LAB_Y);
   for (int i = 0; i < LAB_Y; ++i) {
     getline(f, this->lab[i]);
+    this->used[i].resize(LAB_X);
+    std::fill(used[i].begin(), used[i].end(), false);
   }
+  Image gold = Image("./template1_cpp/img/Gold.png");
+  draw_img(gold, WINDOW_WIDTH / 2 - LEVEL_X * tileSize / 2, WINDOW_HEIGHT / 2 - (LEVEL_Y / 2 + 2) * tileSize - 2, screen);
+  this->x_offs = WINDOW_WIDTH / 2 - LEVEL_X * tileSize / 2 + gold.Width();
   this->draw_level(0, 0);
 }
 
@@ -136,6 +164,7 @@ int Labirynth::draw_level(int x, int y)
   Image LADDER = Image("./template1_cpp/img/floor_ladder.png");
   Image FLOOR = Image("./template1_cpp/img/floor_1.png");
   Image GOLD = Image("./template1_cpp/img/chest_full_open_anim_f0.png");
+  Image DOOR = Image("./template1_cpp/img/doors_leaf_closed.png");
   int xbeg = WINDOW_WIDTH / 2 - tileSize * LEVEL_X / 2;
   int ybeg = WINDOW_HEIGHT / 2 - tileSize * LEVEL_Y / 2;
   for (int i = 0; i < tileSize * LEVEL_Y; ++i) {
@@ -160,6 +189,10 @@ int Labirynth::draw_level(int x, int y)
       else if (c == ' ') {
         screen->PutPixel(xbeg + j, ybeg + i, backgroundColor);
         this->background->PutPixel(xbeg + j, ybeg + i, backgroundColor);
+      }
+      else if (c == 'Q') {
+        screen->PutPixel(xbeg + j, ybeg + i, DOOR.GetPixel(j % tileSize, i % tileSize));
+        this->background->PutPixel(xbeg + j, ybeg + i, DOOR.GetPixel(j % tileSize, i % tileSize));
       }
     }
   }
