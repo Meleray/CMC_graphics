@@ -2,6 +2,7 @@
 #include "Image.h"
 #include "Player.h"
 #include <unistd.h>
+#include <cmath>
 
 const unsigned int MS = 1000000;
 
@@ -20,6 +21,53 @@ struct InputState
 
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
+
+void create_kernel(std::vector<std::vector<double>> &GKernel) 
+{ 
+    // intialising standard deviation to 1.0 
+    double sigma = 0.5; 
+    double r, s = 2.0 * sigma * sigma; 
+  
+    // sum is for normalization 
+    double sum = 0.0; 
+  
+    // generating 5x5 kernel 
+    for (int x = -2; x <= 2; x++) { 
+        for (int y = -2; y <= 2; y++) { 
+            r = std::sqrt(x * x + y * y); 
+            GKernel[x + 2][y + 2] = (std::exp(-(r * r) / s)) / (M_PI * s); 
+            sum += GKernel[x + 2][y + 2]; 
+        } 
+    } 
+  
+    // normalising the Kernel 
+    for (int i = 0; i < 5; ++i) 
+        for (int j = 0; j < 5; ++j) 
+            GKernel[i][j] /= sum; 
+} 
+
+
+void blur(Image &img) {
+  Image tmp(WINDOW_WIDTH, WINDOW_HEIGHT, 4);
+  std::vector<std::vector<double>> kernel(5, std::vector<double>(5));
+  create_kernel(kernel); 
+  for (int i = 0; i < img.Height(); ++i) {
+    for (int j = 0; j < img.Width(); ++j) {
+      for (int y = -2; y <= 2; ++y) {
+        for (int x = -2; x <= 2; ++x) {
+          if (i + y > 0 && i + y < WINDOW_HEIGHT && j + x > 0 && j + x < WINDOW_WIDTH) {
+            tmp.PutPixel(j + x, i + y, tmp.GetPixel(j + x, i + y) + kernel[x + 2][y + 2] * img.GetPixel(j, i));
+          }
+        }
+      }
+    }
+  }
+  for (int i = 0; i < img.Height(); ++i) {
+    for (int j = 0; j < img.Width(); ++j) {
+      img.PutPixel(j, i, tmp.GetPixel(j, i));
+    }
+  }
+}
 
 
 void OnKeyboardPressed(GLFWwindow* window, int key, int scancode, int action, int mode)
@@ -156,6 +204,8 @@ int main(int argc, char** argv)
   Player player(&lab, starting_pos);
   glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);  GL_CHECK_ERRORS;
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f); GL_CHECK_ERRORS;
+  blur(screenBuffer);
+  blur(background);
 
   //game loop
 	while (!glfwWindowShouldClose(window))
@@ -177,9 +227,13 @@ int main(int argc, char** argv)
     }
 
     player.Draw(screenBuffer);
+    if (end == 1) {
+      blur(screenBuffer);
+      blur(background);
+      
+    }
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); GL_CHECK_ERRORS;
     glDrawPixels (WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, screenBuffer.Data()); GL_CHECK_ERRORS;
-
 		glfwSwapBuffers(window);
 	}
 

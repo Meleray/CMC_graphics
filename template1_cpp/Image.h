@@ -15,6 +15,9 @@ struct Pixel
 
 constexpr Pixel backgroundColor{0, 0, 0, 0};
 
+Pixel operator*(double c, Pixel a);
+Pixel operator+(Pixel a, Pixel b);
+
 struct Image
 {
   explicit Image(const std::string &a_path);

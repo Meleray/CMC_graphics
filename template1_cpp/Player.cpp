@@ -61,15 +61,13 @@ int Player::ProcessInput(MovementDir dir)
     default:
       break;
   }
-  std::pair<int, int> tile_coords = get_tile_coords(coords.x + tileSize / 2, coords.y);
+  std::pair<int, int> tile_coords = get_tile_coords(coords.x + tileSize / 2, coords.y + tileSize / 2);
   char c = lab->level[tile_coords.second][tile_coords.first];
   if (c == ' ') {
     Image gameover = Image("./template1_cpp/img/Gameover.png");
     draw_img(gameover, WINDOW_WIDTH / 2 - LEVEL_X * tileSize / 2, WINDOW_HEIGHT - 20 * tileSize, this->lab->screen);
     return -1;
   }
-  tile_coords = get_tile_coords(coords.x + tileSize / 2, coords.y + tileSize / 2);
-  c = lab->level[tile_coords.second][tile_coords.first];
   if (c == '#') {
     coords.x = old_coords.x;
     coords.y = old_coords.y;
@@ -85,6 +83,7 @@ int Player::ProcessInput(MovementDir dir)
       y_global += dy;
       coords.x = WINDOW_WIDTH / 2 - dx * (LEVEL_X / 2 - 3) * tileSize;
       coords.y = WINDOW_HEIGHT / 2 + dy * (LEVEL_Y / 2 - 3) * tileSize;
+      return 1;
     }
   }
   if (c == 'G' && !this->lab->used[y_global][x_global]) {

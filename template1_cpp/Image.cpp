@@ -7,6 +7,20 @@
 
 #include <iostream>
 
+Pixel operator*(double c, Pixel a) {
+  a.r = (double)a.r * c;
+  a.b = (double)a.b * c;
+  a.g = (double)a.g * c;
+  return a;
+}
+
+Pixel operator+(Pixel a, Pixel b) {
+  a.r += b.r;
+  a.b += b.b;
+  a.g += b.g;
+  return a;
+}
+
 
 Image::Image(const std::string &a_path)
 {
